@@ -19,20 +19,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set("port", 5000);
 
-if (process.env.NODE_ENV === "production") {
-  app.get("*", function(req, res) {
-    res.res.sendFile(path.resolve("build", "index.html"));
-  });
-}
+app.get("*", function(req, res) {
+  res.res.sendFile(path.resolve("build", "index.html"));
+});
 
 app.post("/prices/new", (req, res) => {
-  console.log("1");
-
   pusher.trigger("coin-prices", "prices", {
     prices: req.body.prices
   });
-  console.log("2");
-
   res.sendStatus(200);
 });
 
