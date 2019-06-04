@@ -1,11 +1,9 @@
-// server.js
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const app = express();
 const Pusher = require("pusher");
 
-//initialize Pusher with your appId, key, secret and cluster
 const pusher = new Pusher({
   appId: "796875",
   key: "5fa9ca0824fa47b87f98",
@@ -14,11 +12,9 @@ const pusher = new Pusher({
   encrypted: true
 });
 
-// Body parser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// CORS middleware
 app.use((req, res, next) => {
   // Website you wish to allow to connect
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -39,19 +35,20 @@ app.use((req, res, next) => {
   next();
 });
 
-// Set port to be used by Node.js
 app.set("port", 5000);
 
 app.get("/", (req, res) => {
   res.send("Welcome");
 });
 
-// API route in which the price information will be sent to from the clientside
 app.post("/prices/new", (req, res) => {
-  // Trigger the 'prices' event to the 'coin-prices' channel
+  console.log("1");
+
   pusher.trigger("coin-prices", "prices", {
     prices: req.body.prices
   });
+  console.log("2");
+
   res.sendStatus(200);
 });
 

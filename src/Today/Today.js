@@ -4,13 +4,13 @@ import axios from "axios";
 import Pusher from "pusher-js";
 
 class Today extends Component {
-  // Adds a class constructor that assigns the initial state values:
   state = {
     btcprice: 0,
     ltcprice: 0,
     ethprice: 0
   };
 
+  //let’s create a simple function that takes in an argument and sends it to the backend server API.
   sendPricePusher(data) {
     axios
       .post("/prices/new", {
@@ -24,13 +24,21 @@ class Today extends Component {
       });
   }
 
+  saveStateToLocalStorage = () => {
+    localStorage.setItem("today-state", JSON.stringify(this.state));
+  };
+
+  restoreStateFromLocalStorage = () => {
+    const state = JSON.parse(localStorage.getItem("today-state"));
+    this.setState(state);
+  };
+
   // This is called when an instance of a component is being created and inserted into the DOM.
   componentDidMount() {
     if (!navigator.onLine) {
-      this.setState({ btcprice: localStorage.getItem("BTC") });
-      this.setState({ ethprice: localStorage.getItem("ETH") });
-      this.setState({ ltcprice: localStorage.getItem("LTC") });
+      return this.saveStateToLocalStorage();
     }
+
     // establish a connection to Pusher
     this.pusher = new Pusher("APP_KEY", {
       cluster: "eu",
@@ -43,19 +51,19 @@ class Today extends Component {
       .get(
         "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,LTC&tsyms=USD"
       )
-      .then(response => {
-        this.setState({ btcprice: response.data.BTC.USD });
-        localStorage.setItem("BTC", response.data.BTC.USD);
+      .then(({ data: { BTC, ETH, LTC } }) => {
+        // Since we're never using responseh or data directly might aswell deconstruct it here
 
-        this.setState({ ethprice: response.data.ETH.USD });
-        localStorage.setItem("ETH", response.data.ETH.USD);
-
-        this.setState({ ltcprice: response.data.LTC.USD });
-        localStorage.setItem("LTC", response.data.LTC.USD);
+        this.setState(
+          {
+            btcprice: BTC.USD,
+            ethprice: ETH.USD,
+            ltcprice: LTC.USD
+          },
+          this.saveStateToLocalStorage
+        ); // You can pass a callback function to setState
       })
-      .catch(error => {
-        console.log(error);
-      });
+      .catch(console.error);
 
     // Let's store this interval in our class so that we can remove it in componentWillUnmount
     this.cryptoSubscription = setInterval(() => {
@@ -66,19 +74,37 @@ class Today extends Component {
         .then(({ data }) => {
           // This is a style question, I prefed doing it this way, to each its own
           this.sendPricePusher(data);
+          console.log(data);
+          this.setState({
+            btcprice: data.BTC.USD,
+            ethprice: data.ETH.USD,
+            ltcprice: data.LTC.USD
+          });
         })
         .catch(console.error);
     }, 10000);
+    console.log("111");
+
     // We bind to the 'prices' event and use the data in it (price information) to update the state values, thus, realtime changes
     this.prices.bind(
       "prices",
-      price => {
-        this.setState({ btcprice: price.prices.BTC.USD });
-        this.setState({ ethprice: price.prices.ETH.USD });
-        this.setState({ ltcprice: price.prices.LTC.USD });
+      ({ prices: { BTC, ETH, LTC } }) => {
+        console.log("bind lai data");
+
+        this.setState(
+          {
+            btcprice: BTC.USD,
+            ethprice: ETH.USD,
+            ltcprice: LTC.USD
+          },
+          this.saveStateToLocalStorage
+        );
       },
       this
     );
+  }
+  componentWillUnmount() {
+    clearInterval(this.cryptoSubscription);
   }
   // The render method contains the JSX code which will be compiled to HTML.
   render() {

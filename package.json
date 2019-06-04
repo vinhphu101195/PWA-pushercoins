@@ -34,5 +34,18 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "package for pwa-pushercoin",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinhphu101195/PWA-pushercoins.git"
+  },
+  "author": "Phu Chau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinhphu101195/PWA-pushercoins/issues"
+  },
+  "homepage": "https://github.com/vinhphu101195/PWA-pushercoins#readme"
 }

@@ -164,6 +164,25 @@ class History extends Component {
     this.getThreeDaysPrice();
     this.getFourDaysPrice();
   }
+  componentDidMount() {
+    if (!navigator.onLine) {
+      this.setState({
+        todayprice: JSON.parse(localStorage.getItem("todayprice"))
+      });
+      this.setState({
+        yesterdayprice: JSON.parse(localStorage.getItem("yesterdayprice"))
+      });
+      this.setState({
+        twodaysprice: JSON.parse(localStorage.getItem("twodaysprice"))
+      });
+      this.setState({
+        threedaysprice: JSON.parse(localStorage.getItem("threedaysprice"))
+      });
+      this.setState({
+        fourdaysprice: JSON.parse(localStorage.getItem("fourdaysprice"))
+      });
+    }
+  }
   render() {
     return (
       <div className="history--section container">
