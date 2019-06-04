@@ -5,9 +5,6 @@ const app = express();
 const Pusher = require("pusher");
 
 app.use(express.static("client/build"));
-app.get("*", function(req, res) {
-  res.sendfile(path.resolve(__dirname, "client", "build", "index.html"));
-});
 
 const pusher = new Pusher({
   appId: "796875",
@@ -20,31 +17,13 @@ const pusher = new Pusher({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  // Pass to next layer of middleware
-  next();
-});
-
 app.set("port", 5000);
 
-app.get("/", (req, res) => {
-  res.send("Welcome");
-});
+if (process.env.NODE_ENV === "production") {
+  app.get("*", function(req, res) {
+    res.res.sendFile(path.resolve("build", "index.html"));
+  });
+}
 
 app.post("/prices/new", (req, res) => {
   console.log("1");
