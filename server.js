@@ -4,6 +4,11 @@ const bodyParser = require("body-parser");
 const app = express();
 const Pusher = require("pusher");
 
+app.use(express.static("client/build"));
+app.get("*", function(req, res) {
+  res.sendfile(path.resolve(__dirname, "client", "build", "index.html"));
+});
+
 const pusher = new Pusher({
   appId: "796875",
   key: "5fa9ca0824fa47b87f98",
